@@ -82,8 +82,6 @@ public class SensorService extends Service {
     private long stime;
 	private SensorControl sensorControl = null;
 	private LocationControl locationControl = null;
-	private SensorControl.SensorControlTask sensorTask = null;
-	private Thread sensorThread = null;
 	
 	/*
 	 * File I/O Variables 
@@ -255,15 +253,8 @@ public class SensorService extends Service {
 		 */
 		locationControl = new LocationControl(this, mLocationManager, 1000 * 60, 200, 5000);
 		
-		
-		/*
-		 * Setup SensorControl object for scheduling sensor recording
-		 */
-		/*try {
-			sensorControl = new SensorControl(sensorFile, mSensorManager);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
+		sensorControl = new SensorControl(mSensorManager, serviceContext, 30000);
+
 
 		//Register for result intents from XML Survey
 		IntentFilter activityResultFilter = 
@@ -286,14 +277,13 @@ public class SensorService extends Service {
 		httpPostThread = new Thread(httpPostRunnable);
 		httpPostThread.start();
 		
+		
 		try {
-			sensorControl = new SensorControl(null, mSensorManager);
+			prepareIO();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		//prepareIO();
 		prepareAlarms();
 		//prepareBluetooth();
 	}
@@ -321,7 +311,7 @@ public class SensorService extends Service {
 		scheduleSensor = PendingIntent.getBroadcast(
 				serviceContext, 0, scheduleSensorIntent, 0);
 		mAlarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				SystemClock.elapsedRealtime() + 10000, 1000 * 30, scheduleSensor);
+				SystemClock.elapsedRealtime() + 10000, 1000 * 31, scheduleSensor);
 		
 		Intent scheduleLocationIntent = new Intent(SensorService.ACTION_SCHEDULE_LOCATION);
 		scheduleLocation = PendingIntent.getBroadcast(
@@ -398,7 +388,9 @@ public class SensorService extends Service {
 	 */
 	@Override
 	public void onDestroy(){
-		Log.d(TAG,"Sensor service destroyed");
+		locationControl.cancel();
+		sensorControl.cancel();
+		
 		httpPostRunnable.stop();
 		try {
 			httpPostThread.interrupt();
@@ -406,6 +398,7 @@ public class SensorService extends Service {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
 		if(affectivaRunnable != null){
 			affectivaRunnable.stop();
 			try {
@@ -414,17 +407,20 @@ public class SensorService extends Service {
 				e.printStackTrace();
 			}
 		}
-		//notificationManager.cancelAll()
+		
 		notificationManager.cancel(SensorService.SERVICE_NOTIFICATION_ID);
-		//SensorService.this.unregisterReceiver(batteryLevelReceiver);
+		
 		SensorService.this.unregisterReceiver(alarmReceiver);
 		SensorService.this.unregisterReceiver(bluetoothReceiver);
+		
 		mAlarmManager.cancel(scheduleSurvey);
 		mAlarmManager.cancel(scheduleSensor);
 		mAlarmManager.cancel(scheduleLocation);
-		sensorControl.forceStop();
+		
 		serviceWakeLock.release();
+		
 		Log.d(TAG,"Service Stopped.");
+		
 		super.onDestroy();
 	}
 	
@@ -434,11 +430,7 @@ public class SensorService extends Service {
 			String action = intent.getAction();
 			if(action.equals(SensorService.ACTION_SCHEDULE_SENSOR)){
 				Log.d(TAG,"Received alarm event - schedule sensor");
-				sensorTask = new SensorControl.SensorControlTask(29900,
-						sensorControl, serviceContext);
-				sensorTask.start();
-				sensorThread = new Thread(sensorTask);
-				sensorThread.start();
+				sensorControl.startRecording();
 			}
 			else if(action.equals(SensorService.ACTION_SENSOR_DATA)){
 				Log.d(TAG,"Sensor Data Received");
@@ -491,6 +483,7 @@ public class SensorService extends Service {
 			}
 			else if(action.equals(SensorService.ACTION_TRIGGER_SURVEY)){
 				Log.d(TAG,"Received alarm event - trigger survey");
+				
 				Intent i = new Intent(SensorService.ACTION_SCHEDULE_SURVEY);
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				i.putExtra("survey_name", intent.getStringExtra("survey_name"));
@@ -498,10 +491,9 @@ public class SensorService extends Service {
 
 				PendingIntent temp = 
 						PendingIntent.getBroadcast(serviceContext, 0, i, PendingIntent.FLAG_ONE_SHOT);
+				
 				long time = intent.getIntExtra("survey_time", 1);
-				Log.d(TAG,"Trigger time: "+time);
-				//followupIntents.put(i, temp);
-				Log.d(TAG,"Trigger time: "+time);
+				
 				mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
 						SystemClock.elapsedRealtime()+
 						(1000 * 60 * time),	temp);
@@ -515,14 +507,11 @@ public class SensorService extends Service {
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				
 				if(name != null && file != null){
-					//Log.d(TAG,"Triggering survey: "+name+" using "+file);
-					Log.d(TAG,"Trigger time: "+intent.getLongExtra(SurveyAnswer.TRIGGER_TIME, 0L)+"");
 					i.putExtra("survey_name",file);
 					i.putExtra("survey_file",name);
 					serviceContext.startActivity(i);
 				}
 				else{
-					//Log.d(TAG,"Scheduling random assessment");
 					long random = ((new Random(System.currentTimeMillis()).nextInt(120) )* 1000 * 60 + 60000);
 					mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
 							SystemClock.elapsedRealtime()+random , scheduleSurvey);
@@ -534,15 +523,14 @@ public class SensorService extends Service {
 			else if (action.equals(XMLSurveyActivity.INTENT_ACTION_SURVEY_RESULTS)){
 				Log.d(TAG,"Got survey results");
 				Calendar cal = Calendar.getInstance();
+				
 				cal.setTimeInMillis(System.currentTimeMillis());
+				
 				@SuppressWarnings("unchecked")
 				HashMap<String, List<String>> results = 
 						(HashMap<String, List<String>>) intent.getSerializableExtra(XMLSurveyActivity.INTENT_EXTRA_SURVEY_RESULTS);
 				String surveyName = 
 						intent.getStringExtra(XMLSurveyActivity.INTENT_EXTRA_SURVEY_NAME);
-				//Toast.makeText(serviceContext,
-				//		"Activity returned: "+surveyName+" with "+results.size(),
-				//		Toast.LENGTH_LONG).show();
 				
 				try {
 					writeSurveyToFile(surveyName, results, intent.getLongExtra(XMLSurveyActivity.INTENT_EXTRA_COMPLETION_TIME,0L));
@@ -766,14 +754,6 @@ public class SensorService extends Service {
 				AffectivaPacket p = (AffectivaPacket) msg.obj;
 				handleBluetooth(p);
 			}
-			/*else if(msg.what == MESSAGE_LOCATION_DATA){
-				Location l = (Location) msg.obj;
-				handleLocation(l);
-			}
-			else if(msg.what == MESSAGE_SENSOR_DATA){
-				SensorData sd = (SensorData) msg.obj;
-				handleSensor(sd);
-			}*/
 			else if(msg.what == BluetoothRunnable.MessageCode.DISCONNECTED){
 				BluetoothDevice device = (BluetoothDevice) msg.obj;
 				Toast.makeText(serviceContext, "Lost connection to device: "+device.getName(),

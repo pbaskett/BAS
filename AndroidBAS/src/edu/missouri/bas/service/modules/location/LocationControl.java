@@ -1,8 +1,5 @@
 package edu.missouri.bas.service.modules.location;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -10,66 +7,54 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import edu.missouri.bas.service.ScheduleController;
 
-public class LocationControl {
+//TODO: Convert intent broadcasting to handler
+public class LocationControl extends ScheduleController{
 	
 	private final int TIME_THRESHOLD;
 	private final int ACCURACY_THRESHOLD;
 	
 	private LocationManager locationManager;
-	private volatile boolean running = false;
+
 	private Location bestLocation;
 	
 	int checkInterval;
 	float minDistance;
 	
-	Timer locationTimer;
-	
-	long duration;
-	
 	Context serviceContext;
-	
-	public static final String LOCATION_INTENT_KEY = "location_intent_key";
-	public static final String INTENT_ACTION_LOCATION ="intent_action_location";
 	
 	public LocationControl(Context serviceContext,
 			LocationManager locationManager, int time, int accuracy, long duration){
+		
 		this.locationManager = locationManager;
 		this.serviceContext = serviceContext;
 		this.duration = duration;
+		
 		TIME_THRESHOLD = time;
 		ACCURACY_THRESHOLD = accuracy;
+		
 		bestLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 	}
-	
-	public void startRecording(){
-		if(locationTimer != null) locationTimer.cancel();
-		locationTimer = new Timer();
-		
+
+	@Override
+	protected void setup(){
 		for(String provider: locationManager.getAllProviders()){
-			if(provider != LocationManager.NETWORK_PROVIDER)
-				locationManager.requestLocationUpdates(provider,
+			locationManager.requestLocationUpdates(provider,
 					checkInterval, minDistance, locationListener);
-		}
-		
-		running = true;
-		
-		locationTimer.schedule(new TimerTask(){
-			@Override
-			public void run() {
-				locationManager.removeUpdates(locationListener);
-				running = false;
-				Location bestLocation = getLastCachedBestLocation();
-				Intent i = new Intent(INTENT_ACTION_LOCATION);
-				i.putExtra(LOCATION_INTENT_KEY, bestLocation);
-				serviceContext.sendBroadcast(i);
-			}
-		}, duration);
+		}		
 	}
 	
-	public boolean isRunning(){
-		return running;
+	@Override
+	protected void executeTimer(){
+		locationManager.removeUpdates(locationListener);
+		running = false;
+		Location bestLocation = getLastCachedBestLocation();
+		Intent i = new Intent(INTENT_ACTION_LOCATION);
+		i.putExtra(LOCATION_INTENT_KEY, bestLocation);
+		serviceContext.sendBroadcast(i);
 	}
+	
 	
 	public Location getLastCachedNetworkLocation(){
 		return locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
