@@ -25,24 +25,52 @@ import edu.missouri.bas.survey.question.SurveyQuestion;
 
 
 
-
+/* Author: Paul Baskett
+ * Last Update: 9/25/2012
+ * Comments Added
+ * 
+ * Generic activity used for displaying surveys.
+ * Information about the survey to be displayed
+ * is passed in using the creating intent with 
+ * extras ("survey_name", "survey_file"). 
+ */
+//TODO: Add previous question button to go back
+//TODO: Allow multiple questions to be displayed at a once
 public class XMLSurveyActivity extends Activity {
 	
-	public static final String INTENT_ACTION_SURVEY_RESULTS = "action_survey_results";
+	//Constants
+	//Used to pass survey results back 
+	public static final String INTENT_ACTION_SURVEY_RESULTS =
+			"action_survey_results";
 
-	public static final String INTENT_EXTRA_SURVEY_NAME = "survey_name";
+	public static final String INTENT_EXTRA_SURVEY_NAME =
+			"survey_name";
 
-	public static final String INTENT_EXTRA_SURVEY_RESULTS = "survey_results";
+	public static final String INTENT_EXTRA_SURVEY_RESULTS =
+			"survey_results";
 
-	public static final String INTENT_EXTRA_COMPLETION_TIME = "survey_completion_time";
+	public static final String INTENT_EXTRA_COMPLETION_TIME =
+			"survey_completion_time";
 
+	//List of read categories
 	ArrayList<SurveyCategory> cats = null;
 
+	//Current question
 	SurveyQuestion currentQuestion;
+	
+	//Current category
 	SurveyCategory currentCategory;
+	
+	//Category position in arraylist
 	int categoryNum;
+	
+	//Layout question will be displayed on
     LinearLayout surveyLayout;
+    
+    //Button used to submit each question
     Button submitButton;
+    
+    //Will be set if a question needs to skip others
     String skipTo = null;
     
     String surveyName;
@@ -63,6 +91,7 @@ public class XMLSurveyActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_layout);
         
+        //Initialize map that will pass questions and answers to service
         answerMap = new LinkedHashMap<String, List<String>>();
         
         /*
@@ -87,13 +116,12 @@ public class XMLSurveyActivity extends Activity {
         //Setup XML parser
 		XMLParser parser = new XMLParser();
 		
-		//Tell the parser which survey to use
-		//TODO: Get this from starting intent...
-		//surveyName = "morningReport.xml";
-		
+		//Tell the parser which survey to use		
 		surveyName = getIntent().getStringExtra("survey_name");
 		surveyFile = getIntent().getStringExtra("survey_file");
+		
 		Log.d("XMLSurvey","File Name: "+surveyFile);
+		
 		//Open the specified survey
 		try {
 			/*
@@ -150,11 +178,8 @@ public class XMLSurveyActivity extends Activity {
     }
     
     protected void surveyComplete(){
-    	//Store
-    		/*TODO: Doing this in service, 
-    		 * move it here in case service fails? 
-    		 * Will be slower because of i/o.
-    		 */
+
+    	//Fill answer map for when it is passed to service
     	for(SurveyCategory cat: cats){
     		for(SurveyQuestion question: cat.getQuestions()){
     			answerMap.put(question.getId(), question.getSelectedAnswers());
@@ -180,6 +205,7 @@ public class XMLSurveyActivity extends Activity {
     	finish();
     }
     
+    //Get the next question to be displayed
     protected LinearLayout nextQuestion(){
     	SurveyQuestion temp = null;
     	boolean done = false;

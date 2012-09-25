@@ -13,8 +13,19 @@ import org.xml.sax.XMLReader;
 import android.content.Context;
 import edu.missouri.bas.survey.category.SurveyCategory;
 
+/* Author: Paul Baskett
+ * Last Update: 9/25/2012
+ * Comments Added
+ * 
+ * Sets up XML reader and parser, and gives XML
+ * file to parser for handling.  Returns resulting
+ * list of survey categories when finished.
+ */
 public class XMLParser {
 	
+	/*
+	 * Setup SAX Parser
+	 */
 	private XMLReader initializeReader() throws SAXException, ParserConfigurationException {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		SAXParser parser = factory.newSAXParser();
@@ -22,6 +33,10 @@ public class XMLParser {
 		return reader;
 	}
 	
+	/*
+	 * Parse InputSource xml file to list of SurveyInfo
+	 * wrapper objects.
+	 */
 	public ArrayList<SurveyCategory> parseQuestion(InputSource XML,
 			Context c, boolean allowExternalXML, String baseId){
 		try{

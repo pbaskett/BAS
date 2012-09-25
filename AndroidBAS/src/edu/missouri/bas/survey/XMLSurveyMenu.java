@@ -4,6 +4,7 @@ package edu.missouri.bas.survey;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.xml.sax.InputSource;
 
@@ -22,7 +23,7 @@ import android.widget.Toast;
 public class XMLSurveyMenu extends Activity{
 	
 	Button morningButton;
-	ArrayList<SurveyInfo> surveys;
+	List<SurveyInfo> surveys;
 	HashMap<View, SurveyInfo> buttonMap;
 	//SurveyInfo currentSurvey;
 	
@@ -42,6 +43,7 @@ public class XMLSurveyMenu extends Activity{
 		
 		XMLConfigParser configParser = new XMLConfigParser();
 		
+		//Try to read surveys from give file
 		try {
 			surveys = configParser.parseQuestion(new InputSource(getAssets().open("config.xml")));
 		} catch (IOException e) {
