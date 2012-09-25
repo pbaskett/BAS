@@ -1,0 +1,46 @@
+<root>
+	<category type = "random">		
+		<description>Mood and Impulsivity Items</description>
+		<questionblock type="radio">
+			<answer id = "1">1 - Very Slightly or Not At All</answer>
+			<answer id = "2">2 - A little</answer>
+			<answer id = "3">3 - Somewhat</answer>
+			<answer id = "4">4 - Quite a bit</answer>
+			<answer id = "5">5 - Extremely</answer>
+			<text id="1">Did you feel: afraid</text>
+			<text id="2">Did you feel: ashamed</text>
+			<text id="3">Did you feel: distressed</text>
+			<text id="4">Did you feel: hostile</text>
+			<text id="5">Did you feel: irritable</text>
+			<text id="6">Did you feel: jittery</text>
+			<text id="7">Did you feel: nervous</text>
+			<text id="8">Did you feel: scared</text>
+			<text id="9">Did you feel: upset</text>
+			<text id="10">Did you feel: frightened</text>
+			<text id="11">Did you feel: shaky</text>
+			<text id="12">Did you feel: angry</text>
+			<text id="13">Did you feel: scornful</text>
+			<text id="14">Did you feel: disgusted</text>
+			<text id="15">Did you feel: loathing</text>
+			<text id="16">Did you feel: sad</text>
+			<text id="17">Did you feel: blue</text>
+			<text id="18">Did you feel: downhearted</text>
+			<text id="19">Did you feel: alone</text>
+			<text id="20">Did you feel: lonely</text>
+			<text id="21">Did you feel: active</text>
+			<text id="22">Did you feel: alert</text>
+			<text id="23">Did you feel: attentive</text>
+			<text id="24">Did you feel: determined</text>
+			<text id="25">Did you feel: enthusiastic</text>
+			<text id="26">Did you feel: excited</text>
+			<text id="27">Did you feel: inspired</text>
+			<text id="28">Did you feel: interested</text>
+			<text id="29">Did you feel: proud</text>
+			<text id="30">Did you feel: strong</text>
+			<text id="31">Did you feel: happy</text>
+			<text id="32">Did you feel: I felt and acted on a strong impulse</text>
+			<text id="33">Did you feel: I did something without really thinking it through</text>
+			<text id="34">Did you feel: I did something for the thrill of it</text>			
+		</questionblock>
+	</category>
+</root>
