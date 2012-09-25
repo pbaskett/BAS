@@ -1,14 +1,13 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/hello_world"
-        tools:context=".MainActivity" />
+    <Button android:id="@+id/start" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Start Service"></Button>
+    <Button android:layout_width="match_parent" android:text="Stop Service" android:id="@+id/button3" android:layout_height="wrap_content"></Button>
+    <TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_height="wrap_content" android:id="@+id/BluetoothState" android:text="Current State: "></TextView>
+    <Button android:layout_width="match_parent" android:text="Get Bluetooth State" android:id="@+id/button2" android:layout_height="wrap_content"></Button>
+    <Button android:layout_width="match_parent" android:text="Start Survey Menu" android:id="@+id/button1" android:layout_height="wrap_content"></Button>
 
-</RelativeLayout>
+</LinearLayout>
