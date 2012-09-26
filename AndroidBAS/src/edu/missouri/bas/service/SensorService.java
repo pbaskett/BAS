@@ -290,9 +290,6 @@ public class SensorService extends Service {
 	
 	
 	private void prepareAlarms(){
-		//Intent scheduleSurvey = new Intent(SensorService.ACTION_SCHEDULE_SURVEY);
-		//Intent scheduleGPS = new Intent(SensorService.ACTION_SCHEDULE_GPS);
-		//Intent scheduleSensor = new Intent(SensorService.ACTION_SCHEDULE_SENSOR);
 		//Intent schedulePicture = new Intent(SensorService.ACTION_SCHEDULE_PICTURE);
 		//Intent scheduleAudio = new Intent(SensorService.ACTION_SCHEDULE_AUDIO);
 		//Intent scheduleTranscription = new Intent(SensorService.ACTION_SCHEDULE_TRANSCRIPTION);

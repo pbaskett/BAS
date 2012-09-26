@@ -36,7 +36,7 @@ public abstract class ScheduleController {
 		
 		running = false;
 		
-		//scheduleTimer = null;
+		scheduleTimer = null;
 	}
 	
 	protected abstract void setup();

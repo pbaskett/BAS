@@ -62,7 +62,7 @@ public class SensorControl extends ScheduleController{
 		Intent i = new Intent(SensorService.ACTION_SENSOR_DATA);
 		i.putExtra(SENSOR_AVERAGE, average);
 		serviceContext.sendBroadcast(i);
-		serviceContext = null;
+		//serviceContext = null;
 	}
 	
 	protected double[] getAverage(){

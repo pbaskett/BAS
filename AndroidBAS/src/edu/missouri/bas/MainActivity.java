@@ -2,44 +2,86 @@ package edu.missouri.bas;
 
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 import edu.missouri.bas.activities.DeviceListActivity;
 import edu.missouri.bas.bluetooth.BluetoothRunnable;
 import edu.missouri.bas.service.SensorService;
 import edu.missouri.bas.survey.XMLSurveyMenu;
 
-public class MainActivity extends Activity {
-	Button start;
-	Button startSurveyMenu;
+public class MainActivity extends ListActivity {
+
 	private boolean mIsRunning=false;
-	BluetoothAdapter mAdapter;
-	final static String TAG = "SensorServiceActivity";
-	public final static int REQUEST_ENABLE_BT = 3;
+	private BluetoothAdapter mAdapter;
+	
+	private final static String TAG = "SensorServiceActivity";
+	
+	public static final int REQUEST_ENABLE_BT = 3;
 	public static final int INTENT_SELECT_DEVICES = 0;
 	public static final int INTENT_DISCOVERY = 1;
 	public static final int INTENT_VIEW_DEVICES = 2;
-	TextView stateView;
+	
+	protected static final int START = 0;
+	protected static final int STOP = 1;
+	protected static final int SURVEY = 2;
+	protected static final int STATE = 3;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        start = (Button) findViewById(R.id.start);
-        startSurveyMenu = (Button) findViewById(R.id.button1);
+        //setContentView(R.layout.activity_main);
         
+    	String[] options = {"Start Service", "Stop Service", "Survey Menu",
+		"Check Bluetooth State", "Disconnect Bluetooth"};
+    	
+    	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+    			android.R.layout.simple_list_item_1, options);
+    	setListAdapter(adapter);
+    
+        ListView listView = getListView();
+        
+        //listView.setBackgroundColor(Color.BLACK);
+        //listView.
+        
+        listView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+		    	switch(position){
+	    		case START:
+	    			startSService();
+	    			break;
+	    		case STOP:
+	    			stopSService();
+	    			break;
+	    		case SURVEY: 
+	    			startSurveyMenu();
+	    			break;
+	    		case STATE: 
+	    			getState();
+	    			break;
+		    	}
+			}
+        	
+        });
+
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         
         if(mAdapter == null){
@@ -55,45 +97,15 @@ public class MainActivity extends Activity {
         
         IntentFilter intentFilter = new IntentFilter(SensorService.ACTION_BLUETOOTH_STATE_RESULT);
         this.registerReceiver(bluetoothReceiver, intentFilter);
-            
-        start.setOnClickListener(new View.OnClickListener() {	
-			@Override
-			public void onClick(View v) {
-				Log.d(TAG,"Starting service");
-				startSService();
-			}
-		});
         
-        Button btState = (Button) findViewById(R.id.button2);
-        
-       btState.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getState();
-			}
-		});
-        
-        startSurveyMenu.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent(getApplicationContext(), XMLSurveyMenu.class);
-				startActivity(i);
-			}
-		});
-        
-        Button stopService = (Button) findViewById(R.id.button3);
-        
-        stopService.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				stopSService();
-			}
-		});
-        
-        stateView = (TextView) findViewById(R.id.BluetoothState);
+        startSService();
+                
         getState();
+    }
+    
+    private void startSurveyMenu(){
+		Intent i = new Intent(getApplicationContext(), XMLSurveyMenu.class);
+		startActivity(i);
     }
     
     private void stopSService() {
@@ -114,7 +126,7 @@ public class MainActivity extends Activity {
             // When the request to enable Bluetooth returns
             if (resultCode == Activity.RESULT_OK) {
                 // Bluetooth is now enabled, so set up a chat session
-                //setupChat();
+
             } else {
                 // User did not enable Bluetooth or an error occurred
                 Log.d(TAG, "BT not enabled");
@@ -134,10 +146,6 @@ public class MainActivity extends Activity {
 				connectIntent.putExtra(SensorService.INTENT_EXTRA_BT_UUID,
 						"00001101-0000-1000-8000-00805F9B34FB");
 				this.sendBroadcast(connectIntent);
-				//BluetoothDevice device = null;
-				//BluetoothRunnable b = setupRunnable(mHandler, device, SPP_UUID,
-				//		BluetoothMode.CLIENT, BluetoothSocketType.INSECURE, null);
-				//setupGlobalBluetoothRunnable(b);
 			break;
         }
     }
@@ -179,13 +187,8 @@ public class MainActivity extends Activity {
 			String action = intent.getAction();
 			if(action.equals(SensorService.ACTION_BLUETOOTH_STATE_RESULT)){
 				Log.d(TAG,"Got bluetooth state change");
-				/*String deviceName = 
-					intent.getStringExtra(SensorService.INTENT_EXTRA_BT_DEVICE_NAME);
-				String deviceAddress = 
-					intent.getStringExtra(SensorService.INTENT_EXTRA_BT_DEVICE_ADDRESS);*/
 				String stateInformation = intent.getStringExtra(SensorService.INTENT_EXTRA_BT_STATE);
-				
-				stateView.setText(stateInformation);				
+				Toast.makeText(getApplicationContext(), stateInformation, Toast.LENGTH_LONG).show();
 			}
 		}
 	};
