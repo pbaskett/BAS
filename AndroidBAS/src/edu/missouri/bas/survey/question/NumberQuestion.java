@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import android.R;
 import android.content.Context;
+import android.util.TypedValue;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -30,6 +31,8 @@ public class NumberQuestion extends Question {
 		questionText.setTextAppearance(c, R.attr.textAppearanceLarge);
 		counterText = new TextView(c);
 		counterText.setText("0 drinks");
+		counterText.setTextSize(TypedValue.COMPLEX_UNIT_DIP,18);
+
 		
 		SeekBar sb = new SeekBar(c);
 		sb.setMax(15);

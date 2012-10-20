@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.SystemClock;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
@@ -40,7 +41,8 @@ public class RadioQuestion extends Question {
 		
 		TextView questionText = new TextView(c);
 		questionText.setText(getQuestion());
-		questionText.setTextAppearance(c, R.attr.textAppearanceLarge);
+		//questionText.setTextAppearance(c, R.attr.textAppearanceLarge);
+		questionText.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20);
 
 		
 		RadioGroup radioGroup = new RadioGroup(c);
@@ -49,6 +51,8 @@ public class RadioQuestion extends Question {
 		for(SurveyAnswer ans: this.answers){
 			RadioButton temp = new RadioButton(c);
 			temp.setText(ans.getValue());
+			temp.setTextSize(TypedValue.COMPLEX_UNIT_DIP,18);
+
 			radioGroup.addView(temp);
 
 			answerViews.put(temp, ans);
@@ -91,6 +95,7 @@ public class RadioQuestion extends Question {
 				long[] times = selectedAnswer.getTriggerTimes();
 				String triggerName = selectedAnswer.getTriggerName();
 				String triggerFile = selectedAnswer.getTriggerFile();
+				Log.d("RADIO QUESTION","Times: "+times.length);
 				int counter = 0;
 				for(long time: times){
 					Log.d("RadioQuestion","Time: "+time);
@@ -105,6 +110,7 @@ public class RadioQuestion extends Question {
 	
 	private void triggerSurvey(long time, String triggerFile, 
 			String triggerName, int counter){
+		Log.d("RADIO QUESTION","Triggering survey number: "+counter);
 		AlarmManager manager = 
 				(AlarmManager) broadcastContext.getSystemService(Context.ALARM_SERVICE);
 		Intent broadcast = new Intent(SensorService.ACTION_SCHEDULE_SURVEY);
@@ -114,7 +120,7 @@ public class RadioQuestion extends Question {
 		broadcast.putExtra(SurveyAnswer.TRIGGER_TIME, time);
 		broadcast.putExtra("id"+counter, counter);
 		PendingIntent temp = PendingIntent.getBroadcast(
-				broadcastContext, 0, broadcast, PendingIntent.FLAG_ONE_SHOT);
+				broadcastContext, counter, broadcast, PendingIntent.FLAG_ONE_SHOT);
 		manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
 				SystemClock.elapsedRealtime()+time, temp);
 

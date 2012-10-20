@@ -35,6 +35,8 @@ public class LocationControl extends ScheduleController{
 		ACCURACY_THRESHOLD = accuracy;
 		
 		bestLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		
+		if(bestLocation != null) Log.d("LocationControl",bestLocation.toString());
 	}
 
 	@Override
@@ -65,9 +67,12 @@ public class LocationControl extends ScheduleController{
 	}
 	
 	public Location getLastCachedBestLocation(){
-		synchronized(bestLocation){
-			return bestLocation;
+		if(bestLocation != null){
+			synchronized(bestLocation){
+				return bestLocation;
+			}
 		}
+		return null;
 	}
 	
 	public Location updateBestLocation(Location newLocation, Location bestLocation){
@@ -106,8 +111,10 @@ public class LocationControl extends ScheduleController{
 	LocationListener locationListener = new LocationListener() {
 		public void onLocationChanged(Location location) {
 			Log.d("LocationControl","Got new location");
-			synchronized(bestLocation){
-				bestLocation = updateBestLocation(location, bestLocation);
+			if(bestLocation != null){
+				synchronized(bestLocation){
+						bestLocation = updateBestLocation(location, bestLocation);
+				}
 			}
 	    }
 

@@ -8,6 +8,7 @@ import android.R;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -43,8 +44,10 @@ public class RadioInputQuestion extends Question{
 		
 		TextView questionText = new TextView(c);
 		questionText.setText(getQuestion());
-		questionText.setTextAppearance(c, R.attr.textAppearanceLarge);
+		//questionText.setTextAppearance(c, R.attr.textAppearanceLarge);
+		questionText.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20);
 
+		
 		RadioGroup radioGroup = new RadioGroup(c);
 		radioGroup.setOrientation(RadioGroup.VERTICAL);
 		
@@ -65,6 +68,8 @@ public class RadioInputQuestion extends Question{
 		for(SurveyAnswer ans: this.answers){
 			RadioButton temp = new RadioButton(c);
 			temp.setText(ans.getValue());
+			temp.setTextSize(TypedValue.COMPLEX_UNIT_DIP,15);
+
 			radioGroup.addView(temp);
 			//temp.setText(ans.getAnswerText());
 

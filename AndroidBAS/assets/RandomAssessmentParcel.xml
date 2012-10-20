@@ -4,7 +4,7 @@
 		<description>Recent Drinking</description>
 		<question id = "q11" type = "radio">
 			<text>Have you CONSUMED ALCOHOL since the last survey you answered?</text>
-			<answer id = "a11y" triggerFile="DrinkingFollowup.xml" triggerName="DRINKING_FOLLOWUP" triggerTimes="30 m , 60 m , 120 m">yes</answer>
+			<answer id = "a11y" triggerFile="DrinkingFollowup.xml" triggerName="DRINKING_FOLLOWUP" triggerTimes="30 s, 60 s, 120 s">yes</answer>
 			<answer id = "a11n">no</answer>
 		</question>
 	</category>

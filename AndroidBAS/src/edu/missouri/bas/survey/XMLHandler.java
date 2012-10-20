@@ -388,7 +388,7 @@ public class XMLHandler extends DefaultHandler {
 			if(blockAnswerList == null)
 				question.addAnswer(answer);
 			else{
-				Log.d(TAG,"Finished question block answer list, length: "+blockAnswerList.size());
+				//Log.d(TAG,"Finished question block answer list, length: "+blockAnswerList.size());
 				blockAnswerList.add(answer);
 			}
 		}

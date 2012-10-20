@@ -186,7 +186,7 @@ public class XMLSurveyActivity extends Activity {
     			answerMap.put(question.getId(), question.getSelectedAnswers());
     		}
     	}
-		answerMap.put(currentQuestion.getId(), currentQuestion.getSelectedAnswers());
+		//answerMap.put(currentQuestion.getId(), currentQuestion.getSelectedAnswers());
 
     	
     	//Send to service

@@ -265,9 +265,9 @@ public class SensorService extends Service {
 				new IntentFilter(SensorService.ACTION_SENSOR_DATA);
 		SensorService.this.registerReceiver(alarmReceiver, sensorDataFilter);
 		
-		IntentFilter triggerFilter =
+		/*IntentFilter triggerFilter =
 				new IntentFilter(SensorService.ACTION_TRIGGER_SURVEY);
-		SensorService.this.registerReceiver(alarmReceiver, triggerFilter);
+		SensorService.this.registerReceiver(alarmReceiver, triggerFilter);*/
 		
 		Log.d(TAG,"Sensor service created.");
 		
@@ -298,10 +298,10 @@ public class SensorService extends Service {
 				new Intent(SensorService.ACTION_SCHEDULE_SURVEY);
 		scheduleSurvey = PendingIntent.getBroadcast(
 				serviceContext, 0, scheduleSurveyIntent, 0);
-		long randomTime = 60+rand.nextInt(60);
+		//long randomTime = 60+rand.nextInt(60);
 		//randomTime = 1;
 		mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				SystemClock.elapsedRealtime() + 10000 + (1000 * 60 * randomTime), scheduleSurvey);
+				SystemClock.elapsedRealtime() + 1000 + (1000 * 60 * 2), scheduleSurvey);
 		
 		Intent scheduleSensorIntent = 
 				new Intent(SensorService.ACTION_SCHEDULE_SENSOR);
@@ -462,23 +462,24 @@ public class SensorService extends Service {
 				sb.append("\nProvider: ");
 				sb.append(foundLocation.getProvider());
 				Log.d(TAG,"Location: "+sb.toString());*/
-				
-				HashMap<String, String> locationMap = 
-						new HashMap<String, String>();
-				
-				locationMap.put("accuracy", foundLocation.getAccuracy()+"");
-				
-				locationMap.put("longi", foundLocation.getLongitude()+"");
-				
-				locationMap.put("lat", foundLocation.getLatitude()+"");			
-				
-				locationMap.put("source", foundLocation.getProvider());	
-				
-				writeLocationToFile(foundLocation);
-				List<NameValuePair> pairs = parseAssocToList(locationMap);
-				httpPostRunnable.post(new HttpPostRequest("", "LOCATION", pairs));
+				if(foundLocation != null){
+					HashMap<String, String> locationMap = 
+							new HashMap<String, String>();
+					
+					locationMap.put("accuracy", foundLocation.getAccuracy()+"");
+					
+					locationMap.put("longi", foundLocation.getLongitude()+"");
+					
+					locationMap.put("lat", foundLocation.getLatitude()+"");			
+					
+					locationMap.put("source", foundLocation.getProvider());	
+					
+					writeLocationToFile(foundLocation);
+					List<NameValuePair> pairs = parseAssocToList(locationMap);
+					httpPostRunnable.post(new HttpPostRequest("", "LOCATION", pairs));
+				}
 			}
-			else if(action.equals(SensorService.ACTION_TRIGGER_SURVEY)){
+			/*else if(action.equals(SensorService.ACTION_TRIGGER_SURVEY)){
 				Log.d(TAG,"Received alarm event - trigger survey");
 				
 				Intent i = new Intent(SensorService.ACTION_SCHEDULE_SURVEY);
@@ -494,7 +495,7 @@ public class SensorService extends Service {
 				mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
 						SystemClock.elapsedRealtime()+
 						(1000 * 60 * time),	temp);
-			}
+			}*/
 			else if(action.equals(SensorService.ACTION_SCHEDULE_SURVEY)){
 				Log.d(TAG,"Received alarm event - schedule survey");
 				
@@ -506,12 +507,12 @@ public class SensorService extends Service {
 				if(name != null && file != null){
 					i.putExtra("survey_name",file);
 					i.putExtra("survey_file",name);
-					serviceContext.startActivity(i);
+					//serviceContext.startActivity(i);
 				}
 				else{
-					long random = ((new Random(System.currentTimeMillis()).nextInt(120) )* 1000 * 60 + 60000);
+					//long random = ((new Random(System.currentTimeMillis()).nextInt(120) )* 1000 * 60 + 60000);
 					mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-							SystemClock.elapsedRealtime()+random , scheduleSurvey);
+							SystemClock.elapsedRealtime()+ (1000 * 60 * 2) , scheduleSurvey);
 					i.putExtra("survey_name", "RANDOM_ASSESSMENT");
 					i.putExtra("survey_file", "RandomAssessmentParcel.xml");
 				}

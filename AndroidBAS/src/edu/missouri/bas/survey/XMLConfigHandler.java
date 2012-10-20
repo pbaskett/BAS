@@ -87,7 +87,7 @@ public class XMLConfigHandler extends DefaultHandler {
 	@Override
 	public void characters(char[] ch, int start, int length){
 		buffer.append(ch,start,length);
-		Log.d(TAG,"Got some characters");
+		//Log.d(TAG,"Got some characters");
 	}
 	
 	/*

@@ -6,6 +6,7 @@ import android.R;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,8 +27,10 @@ public class TextQuestion extends Question{
 		
 		TextView questionText = new TextView(c);
 		questionText.setText(this.getQuestion());
-		questionText.setTextAppearance(c, R.attr.textAppearanceLarge);
+		//questionText.setTextAppearance(c, R.attr.textAppearanceLarge);
+		questionText.setTextSize(TypedValue.COMPLEX_UNIT_DIP,18);
 
+		
 		EditText editText = new EditText(c);
 		editText.addTextChangedListener(new TextWatcher(){
 

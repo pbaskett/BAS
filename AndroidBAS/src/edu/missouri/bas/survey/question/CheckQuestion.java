@@ -6,6 +6,7 @@ import java.util.Map;
 
 import android.R;
 import android.content.Context;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -30,12 +31,17 @@ public class CheckQuestion extends Question{
 		layout.setOrientation(LinearLayout.VERTICAL);
 		TextView questionText = new TextView(c);
 		questionText.setText(getQuestion());
-		questionText.setTextAppearance(c, R.attr.textAppearanceLarge);
+		//questionText.setTextAppearance(c, R.attr.textAppearanceLarge);
+		questionText.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20);
 
+		
+		
 		layout.addView(questionText);
 		for(SurveyAnswer ans: this.answers){
 			CheckBox temp = new CheckBox(c);
 			temp.setText(ans.getValue());
+			temp.setTextSize(TypedValue.COMPLEX_UNIT_DIP,15);
+
 			answerViews.put(temp, ans);
 			temp.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 				@Override

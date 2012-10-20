@@ -20,7 +20,7 @@
 	<category>
 		<description>Recent Smoking</description>
 		<question id= "q21" type = "radio">
-			<text>Have you SMOKED a cigarette in since wake up?</text>
+			<text>Have you SMOKED a cigarette since wake up?</text>
 			<answer id = "a21y">yes</answer>
 			<answer id = "a21n" skip="q41">no</answer>
 		</question>
