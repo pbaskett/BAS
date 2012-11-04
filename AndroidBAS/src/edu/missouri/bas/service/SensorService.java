@@ -70,11 +70,6 @@ public class SensorService extends Service {
 	private Notification notification;
 	
 	/*
-	 * Java objects used by the service
-	 */
-//	private ScheduledThreadPoolExecutor executePool;
-
-	/*
 	 * Sensor variables
 	 */
 	private LocationManager mLocationManager;
@@ -99,9 +94,6 @@ public class SensorService extends Service {
 	 * Alarm manager variables, for scheduling intents
 	 */
 	private AlarmManager mAlarmManager;
-	//private PendingIntent scheduleIntent;
-	//private PendingIntent activityIntent;
-	//private PendingIntent bluetoothIntent;
 	private PendingIntent scheduleSurvey;
 	private PendingIntent scheduleSensor;
 	private PendingIntent scheduleLocation;
@@ -109,10 +101,6 @@ public class SensorService extends Service {
 	/*
 	 * Static intent actions
 	 */
-	//public static final String ACTION_ALARM = "INTENT_ACTION_ALARM";
-	//public static final String ACTION_BLUETOOTH = "INTENT_ACTION_BLUETOOTH";
-	//public static final String ACTION_SURVEY_ACTIVITY = "INTENT_ACTION_SURVEY_ACTIVITY";
-	//public static final String ACTION_SURVEY_RESULT = "INTENT_ACTION_SURVEY_RESULT";
 	public static final String ACTION_SCHEDULE_SURVEY = "INTENT_ACTION_SCHEDULE_SURVEY";
 
 	public static final String ACTION_SCHEDULE_SENSOR = "INTENT_ACTION_SCHEDULE_SENSOR";
@@ -158,11 +146,11 @@ public class SensorService extends Service {
 	/*
 	 * Bluetooth Variables
 	 */
-	
 	Thread bluetoothThread;
 	AffectivaRunnable affectivaRunnable;
 	String bluetoothMacAddress = "default";
 	BluetoothAdapter mBluetoothAdapter;
+	
 	/*
 	 * Worker Threads
 	 */
@@ -298,10 +286,10 @@ public class SensorService extends Service {
 				new Intent(SensorService.ACTION_SCHEDULE_SURVEY);
 		scheduleSurvey = PendingIntent.getBroadcast(
 				serviceContext, 0, scheduleSurveyIntent, 0);
-		//long randomTime = 60+rand.nextInt(60);
+		long randomTime = 60+rand.nextInt(60);
 		//randomTime = 1;
 		mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				SystemClock.elapsedRealtime() + 1000 + (1000 * 60 * 2), scheduleSurvey);
+				SystemClock.elapsedRealtime() + 1000 + (1000 * 60 * randomTime), scheduleSurvey);
 		
 		Intent scheduleSensorIntent = 
 				new Intent(SensorService.ACTION_SCHEDULE_SENSOR);
@@ -451,17 +439,7 @@ public class SensorService extends Service {
 				Log.d(TAG,"Received alarm event - location found");
 				Location foundLocation = 
 						intent.getParcelableExtra(LocationControl.LOCATION_INTENT_KEY);
-				/*StringBuilder sb = new StringBuilder(50);
-				sb.append(foundLocation.toString());
-				sb.append("\nAccuracy: ");
-				sb.append(foundLocation.getAccuracy());
-				sb.append("\nLat: ");
-				sb.append(foundLocation.getLatitude());
-				sb.append("\nLong: ");
-				sb.append(foundLocation.getLongitude());
-				sb.append("\nProvider: ");
-				sb.append(foundLocation.getProvider());
-				Log.d(TAG,"Location: "+sb.toString());*/
+
 				if(foundLocation != null){
 					HashMap<String, String> locationMap = 
 							new HashMap<String, String>();
@@ -479,23 +457,6 @@ public class SensorService extends Service {
 					httpPostRunnable.post(new HttpPostRequest("", "LOCATION", pairs));
 				}
 			}
-			/*else if(action.equals(SensorService.ACTION_TRIGGER_SURVEY)){
-				Log.d(TAG,"Received alarm event - trigger survey");
-				
-				Intent i = new Intent(SensorService.ACTION_SCHEDULE_SURVEY);
-				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				i.putExtra("survey_name", intent.getStringExtra("survey_name"));
-				i.putExtra("survey_location", intent.getStringExtra("survey_location"));
-
-				PendingIntent temp = 
-						PendingIntent.getBroadcast(serviceContext, 0, i, PendingIntent.FLAG_ONE_SHOT);
-				
-				long time = intent.getIntExtra("survey_time", 1);
-				
-				mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-						SystemClock.elapsedRealtime()+
-						(1000 * 60 * time),	temp);
-			}*/
 			else if(action.equals(SensorService.ACTION_SCHEDULE_SURVEY)){
 				Log.d(TAG,"Received alarm event - schedule survey");
 				
@@ -507,12 +468,11 @@ public class SensorService extends Service {
 				if(name != null && file != null){
 					i.putExtra("survey_name",file);
 					i.putExtra("survey_file",name);
-					//serviceContext.startActivity(i);
 				}
 				else{
-					//long random = ((new Random(System.currentTimeMillis()).nextInt(120) )* 1000 * 60 + 60000);
+					long random = ((new Random(System.currentTimeMillis()).nextInt(60) ) + 60);
 					mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-							SystemClock.elapsedRealtime()+ (1000 * 60 * 2) , scheduleSurvey);
+							SystemClock.elapsedRealtime()+ (1000 * 60 * random) , scheduleSurvey);
 					i.putExtra("survey_name", "RANDOM_ASSESSMENT");
 					i.putExtra("survey_file", "RandomAssessmentParcel.xml");
 				}
@@ -802,7 +762,6 @@ public class SensorService extends Service {
 		}
 		
 		private void handleBluetooth(AffectivaPacket p){
-			//Log.d(TAG,"Received bluetooth packet: "+p.toString());
 			HashMap<String, String> bluetoothMap = 
 				new HashMap<String, String>();
 			bluetoothMap.put("accel_x", p.getAccelerometer().getX()+"");

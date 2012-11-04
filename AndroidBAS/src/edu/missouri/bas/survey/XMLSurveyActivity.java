@@ -70,13 +70,17 @@ public class XMLSurveyActivity extends Activity {
     
     //Button used to submit each question
     Button submitButton;
+    Button backButton;
     
     //Will be set if a question needs to skip others
-    String skipTo = null;
+    boolean skipTo = false;
+    String skipFrom = null;
+    
     
     String surveyName;
     String surveyFile;
     
+    private static final String TAG = "XMLSurveyActivity";
     /*
      * Putting a serializable in an intent seems to default to the class
      * that implements serializable, so LinkedHashMap or TreeMap are treated
@@ -101,7 +105,9 @@ public class XMLSurveyActivity extends Activity {
          * additional specific functionality is needed/
          */
         submitButton = new Button(this);
+        backButton = new Button(this);
         submitButton.setText("Submit");
+        backButton.setText("Previous Question");
         
         submitButton.setOnClickListener(new OnClickListener(){
 			@Override
@@ -111,6 +117,16 @@ public class XMLSurveyActivity extends Activity {
 					if(vg != null)
 						setContentView(vg);
 				}
+			}
+        });
+        
+        backButton.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG,"Going back a question");
+				ViewGroup vg = setupLayout(previousQuestion());
+				if(vg != null)
+					setContentView(vg);
 			}
         });
         
@@ -168,8 +184,12 @@ public class XMLSurveyActivity extends Activity {
 			if(submitButton.getParent() != null){
 				((ViewGroup)submitButton.getParent()).removeView(submitButton);
 			}
+			if(backButton.getParent() != null){
+				((ViewGroup)backButton.getParent()).removeView(backButton);
+			}
 			//Add submit button to layout
 			layout.addView(submitButton);
+			layout.addView(backButton);
 			//Add layout to scroll view in case it's too long
 			sv.addView(layout);
 			//Display scroll view
@@ -211,6 +231,8 @@ public class XMLSurveyActivity extends Activity {
     	SurveyQuestion temp = null;
     	boolean done = false;
     	boolean allowSkip = false;
+    	if(currentQuestion != null && !skipTo)
+    		skipFrom = currentQuestion.getId();
     	do{
     		if(temp != null)
     			answerMap.put(temp.getId(), null);
@@ -227,8 +249,10 @@ public class XMLSurveyActivity extends Activity {
     					currentQuestion.getSkip() != null){
     				//Check if skip is in category
     				RandomCategory tempCat = (RandomCategory) currentCategory;
-    				if(tempCat.containsQuestion(currentQuestion.getSkip()))
-    					allowSkip = true;
+    				if(tempCat.containsQuestion(currentQuestion.getSkip())){
+    					allowSkip = skipTo = true;
+    				}
+    				
     			}
     		}
     		//Out of categories, survey must be done
@@ -253,5 +277,51 @@ public class XMLSurveyActivity extends Activity {
     		currentQuestion = temp;
     		return currentQuestion.prepareLayout(this);
     	}
+    }
+    
+    protected LinearLayout previousQuestion(){
+    	SurveyQuestion temp = null;
+    	while(temp == null){
+    		temp = currentCategory.previousQuestion();
+    		Log.d(TAG,"Trying to get previous question");
+    		/*
+    		 * If temp is null, this category is out of questions,
+    		 * we need to go back to the previous category if it exists.
+    		 */
+    		if(temp == null){
+    			Log.d(TAG,"Temp is null, probably at begining of category");
+    			/* Try to go back a category, get the question on
+    			 * the next iteration.
+    			 */
+    			if(categoryNum - 1 >= 0){
+    				Log.d(TAG,"Moving to previous category");
+    				categoryNum--;
+    				currentCategory = cats.get(categoryNum);
+    			}
+    			//First question in first category, return currentQuestion
+    			else{
+    				Log.d(TAG,"No previous category, staying at current question");
+    				temp = currentQuestion;
+    			}
+    		}
+    		/* A question with no answer must have been skipped,
+    		 * skip it again.
+    		 */
+    		else if(temp != null && !temp.validateSubmit()){
+    			Log.d(TAG, "No answer, skipping question");
+    			temp = null;
+    		}
+    		
+    		if(temp != null && skipTo && !temp.getId().equals(skipFrom)){
+    			temp = null;
+    		}
+    		else if(temp != null && skipTo){
+    			skipTo = false;
+    			skipFrom = null;
+    		}
+    		//Else: valid question, it will be returned.
+    	}
+    	currentQuestion = temp;
+    	return currentQuestion.prepareLayout(this);
     }
 }

@@ -39,4 +39,6 @@ public interface SurveyAnswer {
 	public String getTriggerFile();
 	
 	public long[] getTriggerTimes();
+	
+	public boolean equals(SurveyAnswer ans);
 }

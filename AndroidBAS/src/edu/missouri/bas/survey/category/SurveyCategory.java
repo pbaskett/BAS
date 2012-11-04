@@ -10,6 +10,8 @@ import edu.missouri.bas.survey.question.SurveyQuestion;
 public interface SurveyCategory {
 	
 	public SurveyQuestion nextQuestion();
+	
+	public SurveyQuestion previousQuestion();
 
 	public SurveyQuestion getQuestion(int index);
 	

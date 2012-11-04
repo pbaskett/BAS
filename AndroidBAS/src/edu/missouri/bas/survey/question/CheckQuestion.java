@@ -41,6 +41,12 @@ public class CheckQuestion extends Question{
 			CheckBox temp = new CheckBox(c);
 			temp.setText(ans.getValue());
 			temp.setTextSize(TypedValue.COMPLEX_UNIT_DIP,15);
+			
+			for(Map.Entry<View, SurveyAnswer> entry: answerViews.entrySet()){
+				if(entry.getValue().equals(ans) && entry.getValue().isSelected()){
+					temp.setChecked(true);
+				}
+			}
 
 			answerViews.put(temp, ans);
 			temp.setOnCheckedChangeListener(new OnCheckedChangeListener(){

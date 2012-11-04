@@ -52,8 +52,13 @@ public class RadioQuestion extends Question {
 			RadioButton temp = new RadioButton(c);
 			temp.setText(ans.getValue());
 			temp.setTextSize(TypedValue.COMPLEX_UNIT_DIP,18);
-
+			
 			radioGroup.addView(temp);
+			
+			if(ans.isSelected()){
+				temp.setChecked(true);
+				temp.setSelected(true);
+			}
 
 			answerViews.put(temp, ans);
 			

@@ -14,8 +14,8 @@ import android.widget.TextView;
 public class NumberQuestion extends Question {
 
 	TextView counterText;
-	boolean answered;
-	int result;
+	boolean answered = false;
+	int result = 0;
 	
 	public NumberQuestion(String id){
 		this.questionId = id;
@@ -30,13 +30,13 @@ public class NumberQuestion extends Question {
 		questionText.setText(getQuestion());
 		questionText.setTextAppearance(c, R.attr.textAppearanceLarge);
 		counterText = new TextView(c);
-		counterText.setText("0 drinks");
+		counterText.setText(result + " drink(s)");
 		counterText.setTextSize(TypedValue.COMPLEX_UNIT_DIP,18);
 
 		
 		SeekBar sb = new SeekBar(c);
 		sb.setMax(15);
-		sb.setProgress(0);
+		sb.setProgress(result);
 		sb.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
 			public void onProgressChanged(SeekBar seekBar, int progress,
 					boolean fromUser) {
@@ -58,7 +58,9 @@ public class NumberQuestion extends Question {
 
 	@Override
 	public boolean validateSubmit() {
-		return answered;
+		if(answered && result > 0)
+			return true;
+		return false;
 	}
 	
 	public String getSkip(){

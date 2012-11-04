@@ -131,4 +131,13 @@ public class Answer implements SurveyAnswer {
 	public boolean hasSurveyTrigger(){
 		return hasTrigger;
 	}
+	
+	@Override
+	public boolean equals(SurveyAnswer answer){
+		if(answer == null) return false;
+		if(this.getId().equals(answer.getId()) &&
+				this.getValue().equals(answer.getValue()))
+			return true;
+		return false;		
+	}
 }

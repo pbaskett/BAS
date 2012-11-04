@@ -45,12 +45,14 @@ public class SensorControl extends ScheduleController{
 	protected void setup() {
 		average = new double[3];
 		readings = 0;
+		running = true;
         mSensorManager.registerListener(sensorEventListener, 
                 mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 10);
 	}
 
 	@Override
 	protected void executeTimer() {
+		running = false;
 		mSensorManager.unregisterListener(sensorEventListener);
 		
 		average[0] /= readings;

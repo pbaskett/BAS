@@ -42,6 +42,14 @@ public class Category implements SurveyCategory{
 	}
 	
 	@Override
+	public SurveyQuestion previousQuestion(){
+		if(nextQuestionNumber == 0)
+			return null;
+		else
+			return questions.get(--nextQuestionNumber);
+	}
+	
+	@Override
 	public SurveyQuestion getQuestion(int index){
 		if(index >= questions.size()){
 			return null;
