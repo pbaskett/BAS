@@ -1,6 +1,7 @@
 package edu.missouri.bas.survey.answer;
 
-public interface SurveyAnswer {
+
+public interface SurveyAnswer extends Cloneable{
 	
 	public static final String TRIGGER_NAME = "TRIGGER_NAME";
 	public static final String TRIGGER_FILE = "TRIGGER_FILE";
@@ -41,4 +42,6 @@ public interface SurveyAnswer {
 	public long[] getTriggerTimes();
 	
 	public boolean equals(SurveyAnswer ans);
+	
+	public SurveyAnswer clone();
 }

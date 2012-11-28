@@ -421,7 +421,7 @@ public class SensorService extends Service {
 				Log.d(TAG,"Sensor Data Received");
 				HashMap<String, String> sensorMap =
 						new HashMap<String, String>();
-				double[] avg = intent.getDoubleArrayExtra(SensorControl.SENSOR_AVERAGE);
+				float[] avg = intent.getFloatArrayExtra(SensorControl.SENSOR_AVERAGE);
 				
 				sensorMap.put("xVal", avg[0]+"");
 	

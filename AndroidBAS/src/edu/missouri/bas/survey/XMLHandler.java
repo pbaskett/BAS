@@ -376,7 +376,11 @@ public class XMLHandler extends DefaultHandler {
 		else if(localName.equals("text")){
 			question.setQuestion(buffer.toString());
 			if(blockAnswerList != null){
-				question.addAnswers(blockAnswerList);
+				ArrayList<SurveyAnswer> temp = new ArrayList<SurveyAnswer>();
+				for(SurveyAnswer ans : blockAnswerList){
+					temp.add(ans.clone());
+				}
+				question.addAnswers(temp);
 				category.addQuestion(question);
 				question = null;
 			}

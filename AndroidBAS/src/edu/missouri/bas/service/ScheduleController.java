@@ -34,7 +34,7 @@ public abstract class ScheduleController {
 			}
 		}, duration);
 		
-		running = false;
+		//running = false;
 		
 		scheduleTimer = null;
 	}

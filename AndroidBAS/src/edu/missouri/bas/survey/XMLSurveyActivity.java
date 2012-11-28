@@ -190,6 +190,7 @@ public class XMLSurveyActivity extends Activity {
 			//Add submit button to layout
 			layout.addView(submitButton);
 			layout.addView(backButton);
+			//layout.setL
 			//Add layout to scroll view in case it's too long
 			sv.addView(layout);
 			//Display scroll view

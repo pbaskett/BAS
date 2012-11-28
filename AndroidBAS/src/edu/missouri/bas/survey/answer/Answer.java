@@ -140,4 +140,13 @@ public class Answer implements SurveyAnswer {
 			return true;
 		return false;		
 	}
+	
+	@Override
+	public SurveyAnswer clone(){
+		try {
+			return (SurveyAnswer) super.clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
+	}
 }

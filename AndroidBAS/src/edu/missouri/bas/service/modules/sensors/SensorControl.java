@@ -13,13 +13,15 @@ import edu.missouri.bas.service.SensorService;
 //TODO: Convert intent broadcasting to handler
 public class SensorControl extends ScheduleController{
 
+	private static final String TAG = "SensorControl";
+	
 	/*
 	 * Sensor variables
 	 */
 	private SensorManager mSensorManager;
 	private SensorEventListener sensorEventListener;
 	
-	private volatile double[] average = {0.0, 0.0, 0.0};
+	private volatile float[] average = {0.0f, 0.0f, 0.0f};
 	private double readings;
 	
 	Context serviceContext;
@@ -31,8 +33,25 @@ public class SensorControl extends ScheduleController{
 			Context serviceContext, long duration){
 		this.duration = duration;
 		mSensorManager = sensorManager;
-		this.sensorEventListener = prepareListener();
+		this.sensorEventListener = new SensorEventListener(){
+			@Override
+			public void onAccuracyChanged(Sensor sensor, int accuracy) {	}
+			@Override
+			public void onSensorChanged(SensorEvent event) {
+				float[] values = event.values;
+		    	synchronized (average) {
+		    		if(running){
+		    			Log.d(TAG,"Got sensor reading: "+values[0]+" "+values[1] + " "+values[2]);
+		    			readings++;
+		    			average[0] += values[0];
+		    			average[1] += values[1];
+		    			average[2] += values[2];
+		    		}
+		    	}
+			}
+		};
 		this.serviceContext = serviceContext;
+		Log.d(TAG,"Init - "+this.sensorEventListener);
 	}
 	
 	/*public SensorControl(SensorManager sensorManager, 
@@ -43,11 +62,12 @@ public class SensorControl extends ScheduleController{
 	
 	@Override
 	protected void setup() {
-		average = new double[3];
+		average = new float[3];
 		readings = 0;
 		running = true;
-        mSensorManager.registerListener(sensorEventListener, 
-                mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 10);
+        boolean b = mSensorManager.registerListener(sensorEventListener, 
+                mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        Log.d(TAG,"Setup "+b);
 	}
 
 	@Override
@@ -55,40 +75,23 @@ public class SensorControl extends ScheduleController{
 		running = false;
 		mSensorManager.unregisterListener(sensorEventListener);
 		
-		average[0] /= readings;
-		average[1] /= readings;
-		average[2] /= readings;
+		float[] avg = new float[3];
 		
-		double[] avg = {average[0], average[1], average[2]};
+		synchronized(average){
+			average[0] /= readings;
+			average[1] /= readings;
+			average[2] /= readings;
+			avg[0] = average[0];
+			avg[1] = average[1];
+			avg[2] = average[2];
+		}
+		
+
+		Log.d(TAG,"Vals: "+avg[0]+" "+avg[1] + " " + avg[2]);
 		
 		Intent i = new Intent(SensorService.ACTION_SENSOR_DATA);
 		i.putExtra(SENSOR_AVERAGE, avg);
 		serviceContext.sendBroadcast(i);
 		//serviceContext = null;
 	}
-	
-	protected double[] getAverage(){
-		double[] avg = {average[0], average[1], average[2]};
-		return avg;
-	}
-	
-	private SensorEventListener prepareListener(){
-		return new SensorEventListener(){
-			@Override
-			public void onAccuracyChanged(Sensor sensor, int accuracy) {	}
-			@Override
-			public void onSensorChanged(SensorEvent event) {
-				float[] values = event.values;
-		    	synchronized (this) {
-		    		if(running){
-		    			readings++;
-		    			average[0] += values[0];
-		    			average[1] += values[1];
-		    			average[2] += values[2];
-		    		}
-		    	}
-			}
-		};
-	}
-
 }
